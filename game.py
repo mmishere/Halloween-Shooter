@@ -93,11 +93,11 @@ class Enemy(pygame.sprite.Sprite):
         # pick one of three enemy sprites
         num = random.randint(0, 2)
         if num == 0:
-            self.image = pygame.image.load("enemy1.jpg")
+            self.image = pygame.image.load("enemy1.png")
         elif num == 1:
-            self.image = pygame.image.load("enemy2.jpg")
+            self.image = pygame.image.load("enemy2.png")
         elif num == 2:
-            self.image = pygame.image.load("enemy3.jpg")
+            self.image = pygame.image.load("enemy3.png")
         
         self.image = pygame.transform.scale(self.image, (40, 40))
 
@@ -162,7 +162,7 @@ while True:
         max_idx = random.randint(0, 5) # spawn some number of enemies from 0 to 5
         for i in range(0, max_idx):
             enemy_sprites.add(Enemy())
-        enemy_add_countdown += 200
+        enemy_add_countdown += random.randint(100, 200)
     
 
     key = pygame.key.get_pressed()
