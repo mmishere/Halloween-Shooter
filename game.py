@@ -60,7 +60,7 @@ class MainCharacter(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load("main_character.jpg")
+        self.image = pygame.image.load("main_character.png")
         self.image = pygame.transform.scale(self.image, (60, 60))
 
         self.rect = self.image.get_rect()
