@@ -7,19 +7,6 @@ pygame.init()
 size = width, height = 700, 700
 screen = pygame.display.set_mode(size)
 
-main_character_speed = [0, 0]
-
-
-# enemies randomly spawn every 10 seconds or so idk
-# player has 3 lives
-# maybe use a counter for that
-
-# player can shoot at enemies
-# WASD to move
-# updownleftright to shoot
-# set speed, doesn't change
-
-
 main_sprite = pygame.sprite.Group()
 enemy_sprites = pygame.sprite.Group()
 bullet_sprites = pygame.sprite.Group() # empty at the start
@@ -77,12 +64,8 @@ class MainCharacter(pygame.sprite.Sprite):
         # self.lastHit = pygame.time.get_ticks()
 
         self.total_lives -= 1
-        # death is handled in the loop
-
+        # death is handled in the loop but this was the original code
         # if self.total_lives <= 0:
-        #     # print a "You lose!" message
-        #     # yes it's impossible to win
-        #     print("FAILED")
         #     sys.exit() # placeholder
 
 
@@ -127,19 +110,27 @@ class Enemy(pygame.sprite.Sprite):
             self.enemy_speed[0] = self.enemy_speed[0]
     
     def kill_enemy(self):
-        # remove it
-        # self.rect_sprite.kill()
         pygame.sprite.Sprite.kill(self)
         enemy_sprites.remove(self)
 
 
+# Some helper functions
+
+def make_bullet(direction: str) -> Bullet:
+    return Bullet(main.rect.x, main.rect.y, direction)
+
+def check_main_collisions(collisions):
+    if main_collisions != None:
+        main.hit_main_character()
+        main.collision_immune_time = 30 # immunity frames post-hit
+        main.collision_immune = True
+
+
+main_character_speed = [0, 0]
 main = MainCharacter()
 main_sprite.add(main)
 for i in range(0, 3):
     enemy_sprites.add(Enemy())
-
-def make_bullet(direction: str) -> Bullet:
-    return Bullet(main.rect.x, main.rect.y, direction)
 
 # add to these every X ticks
 enemy_add_countdown = 200 # how often enemies spawn
@@ -213,10 +204,8 @@ while True:
     bullet_sprites.update()
 
     main_collisions = pygame.sprite.spritecollideany(main, enemy_sprites)
-    if main_collisions != None:
-        main.hit_main_character()
-        main.collision_immune_time = 30 # immunity frames post-hit
-        main.collision_immune = True
+    check_main_collisions(main_collisions)
+
 
     # checks for collisions and removes any enemies and bullets that collided
     bullet_collisions = pygame.sprite.groupcollide(bullet_sprites, enemy_sprites, True, True)
@@ -227,15 +216,17 @@ while True:
     enemy_sprites.draw(screen)
     bullet_sprites.draw(screen)
 
+    # check if you've lost
     if main.total_lives <= 0:
-        draw_you_lose = lives_font.render("You lose! " + str("x") + " points", True, (50, 156, 255))
-        screen.blit(draw_you_lose, (100, 100))
+        # draw_you_lose = lives_font.render("You lose! " + str("x") + " points", True, (50, 156, 255)) # points don't work yet
+        draw_you_lose = lives_font.render("You lose!", True, (50, 156, 255))
+        screen.blit(draw_you_lose, (200, 100))
+        break
     
     draw_lives = lives_font.render("Lives: " + str(main.total_lives), True, (51, 156, 255)) # light blue
-    draw_points = lives_font.render("Points: " + str("placeholder"), True, (51, 156, 255))
     screen.blit(draw_lives, (0, 0))
-    screen.blit(draw_points, (0, 30))
+    # draw_points = lives_font.render("Points: " + str("placeholder"), True, (51, 156, 255)) # points don't work yet
+    # screen.blit(draw_points, (0, 30))
 
     pygame.display.flip()
     pygame.event.pump()
-
