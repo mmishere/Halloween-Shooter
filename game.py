@@ -64,9 +64,9 @@ class MainCharacter(pygame.sprite.Sprite):
         # self.lastHit = pygame.time.get_ticks()
 
         self.total_lives -= 1
-        # death is handled in the loop but this was the original code
-        # if self.total_lives <= 0:
-        #     sys.exit() # placeholder
+        # different code to handle death in the loop but here
+        if self.total_lives <= 0:
+            sys.exit() # placeholder
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -216,12 +216,12 @@ while True:
     enemy_sprites.draw(screen)
     bullet_sprites.draw(screen)
 
-    # check if you've lost
-    if main.total_lives <= 0:
-        # draw_you_lose = lives_font.render("You lose! " + str("x") + " points", True, (50, 156, 255)) # points don't work yet
-        draw_you_lose = lives_font.render("You lose!", True, (50, 156, 255))
-        screen.blit(draw_you_lose, (200, 100))
-        break
+    # # check if you've lost
+    # if main.total_lives <= 0:
+    #     # draw_you_lose = lives_font.render("You lose! " + str("x") + " points", True, (50, 156, 255)) # points don't work yet
+    #     draw_you_lose = lives_font.render("You lose!", True, (50, 156, 255))
+    #     screen.blit(draw_you_lose, (200, 100))
+    #     break
     
     draw_lives = lives_font.render("Lives: " + str(main.total_lives), True, (51, 156, 255)) # light blue
     screen.blit(draw_lives, (0, 0))
