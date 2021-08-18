@@ -22,8 +22,16 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
 
-        self.bullet_speed = [4, 4]
-        if direction == "up":
+        self.bullet_speed = [0, 0] # so bullets do nothing if something goes wrong, which makes it easy to check
+        if direction == "up_right":
+            self.bullet_speed = [15, -15]
+        elif direction == "up_left":
+            self.bullet_speed = [-15, -15]
+        elif direction == "down_right":
+            self.bullet_speed = [15, 15]
+        elif direction == "down_left":
+            self.bullet_speed = [-15, 15]
+        elif direction == "up":
             self.bullet_speed = [0, -15]
         elif direction == "down":
             self.bullet_speed = [0, 15]
@@ -31,6 +39,10 @@ class Bullet(pygame.sprite.Sprite):
             self.bullet_speed = [-15, 0]
         elif direction == "right":
             self.bullet_speed = [15, 0]
+        
+        # now make sure nothing went wrong with setting speed
+        if self.bullet_speed == [0, 0]:
+            raise Exception("Bullet speed failed to load!")
     
     def update(self):
         self.rect = self.rect.move(self.bullet_speed)
@@ -115,7 +127,6 @@ class Enemy(pygame.sprite.Sprite):
 
 
 # Some helper functions
-
 def make_bullet(direction: str) -> Bullet:
     return Bullet(main.rect.x, main.rect.y, direction)
 
@@ -126,6 +137,7 @@ def check_main_collisions(collisions):
         main.collision_immune = True
 
 
+# more game setup
 main_character_speed = [0, 0]
 main = MainCharacter()
 main_sprite.add(main)
@@ -138,6 +150,8 @@ bullet_countdown = 0 # how often someone can fire a bullet, starts at 0 because 
 
 lives_font = pygame.font.SysFont("Courier New", 40, bold=pygame.font.Font.bold)
 clock = pygame.time.Clock()
+
+pause = False # to track whether the game is paused
 
 while True:    
     clock.tick(60)
@@ -157,6 +171,20 @@ while True:
     
 
     key = pygame.key.get_pressed()
+    
+    # pause game if necessary
+    if (key[pygame.K_ESCAPE]):
+        pause = True
+    
+    while pause:
+        # this doesn't work yet:
+        # draw_pause = lives_font.render("Paused!", True, (51, 156, 255)) # light blue
+        # screen.blit(draw_pause, (200, 100))
+        for event in pygame.event.get():
+            key = pygame.key.get_pressed()
+            if key[pygame.K_RETURN] or key[pygame.K_ESCAPE]:
+                pause = False
+    
     # wasd moves character; NOT elif, all should be checked each run
     if (key[pygame.K_w]):
         # up
@@ -174,22 +202,30 @@ while True:
     # only shoot one at a time, so elif
     if bullet_countdown <= 0:
         position = main.image.get_rect()
-        if key[pygame.K_UP]:
+        bullet = None
+        # first check diagonals
+        # this gives priority in the order shown, so pressing all keys will just do the first one, etc.
+        if key[pygame.K_UP] and key[pygame.K_RIGHT]:
+            bullet = make_bullet("up_right")
+        elif key[pygame.K_UP] and key[pygame.K_LEFT]:
+            bullet = make_bullet("up_left")
+        elif key[pygame.K_DOWN] and key[pygame.K_RIGHT]:
+            bullet = make_bullet("down_right")
+        elif key[pygame.K_UP] and key[pygame.K_LEFT]:
+            bullet = make_bullet("down_left")
+        elif key[pygame.K_UP]:
             bullet = make_bullet("up")
-            bullet_sprites.add(bullet)
-            bullet_countdown = 30
         elif key[pygame.K_RIGHT]:
             bullet = make_bullet("right")
-            bullet_sprites.add(bullet)
-            bullet_countdown = 30
         elif key[pygame.K_DOWN]:
             bullet = make_bullet("down")
-            bullet_sprites.add(bullet)
-            bullet_countdown = 30
         elif key[pygame.K_LEFT]:
             bullet = make_bullet("left")
+        
+        # if bullet has been made, add bullet to sprites and reset countdown to fire again
+        if bullet != None:
             bullet_sprites.add(bullet)
-            bullet_countdown = 30
+            bullet_countdown = 15
     
     # need to make sure that this doesn't let players or enemies go off the screen either
 
