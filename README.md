@@ -1,3 +1,5 @@
+![halloween_shooter](https://user-images.githubusercontent.com/70784810/141030998-8296fc8c-cd89-4b4d-a073-1b02b88e9c9a.gif)
+
 A fun Halloween-themed shooter game.
 The enemies are clipart. The main character was drawn by me.
 
